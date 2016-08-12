@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["Joe Corcoran <joe@corcoran.io>"]
 
 [dependencies]
+clap = { version = "~2.10", features = ["yaml"] }
+hyper = "~0.9"

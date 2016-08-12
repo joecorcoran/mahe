@@ -1,0 +1,6 @@
+name: mahe
+version: 0.0
+author: Joe Corcoran <joe@corcoran.io>
+subcommands:
+  - name: server
+    about: Run the server
