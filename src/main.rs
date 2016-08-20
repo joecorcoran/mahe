@@ -7,7 +7,6 @@ mod store;
 
 use clap::{App, Arg, SubCommand};
 use server::{ServerOptions, start};
-use store::Store;
 
 fn main() {
     let cli_matches = App::new("mahe")
@@ -24,7 +23,7 @@ fn main() {
             ip: server_matches.value_of("ip").unwrap_or("0.0.0.0"),
             port: server_matches.value_of("port").unwrap_or("8989")
         };
-        let store = Store::new(server_matches.value_of("database").unwrap_or("default"));
-        start(store, options);
+        let db = String::from(server_matches.value_of("database").unwrap_or("default"));
+        start(db, options);
     }
 }
