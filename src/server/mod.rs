@@ -1,6 +1,7 @@
 use hyper::server::{Server, Request, Response};
 use hyper::status::StatusCode;
 use reroute::{Captures, Router};
+use std::io::Read;
 use store::Store;
 
 pub struct ServerOptions<'a> {
@@ -11,12 +12,13 @@ pub struct ServerOptions<'a> {
 pub fn start(db: String, options: ServerOptions) {
     let mut router = Router::new();
     let store = Store::shared(db);
+    let keys_pattern = r"/keys/([^/]+)$";
 
     let get_store = store.clone();
-    router.get(r"/keys/([^/]+)$", move |_: Request, mut res: Response, cap: Captures| {
-        let s = get_store.lock().unwrap();
+    router.get(keys_pattern, move |_: Request, mut res: Response, cap: Captures| {
+        let locked_store = get_store.lock().unwrap();
         if let Some(key) = cap.unwrap().pop() {
-            match s.read(key) {
+            match locked_store.read(key) {
                 Some(value) => {
                     *res.status_mut() = StatusCode::Ok;
                     res.send(value.as_bytes()).unwrap();
@@ -30,9 +32,24 @@ pub fn start(db: String, options: ServerOptions) {
     });
 
     let post_store = store.clone();
-    router.post("/keys", move |_, res, _| {
-        let s = post_store.lock().unwrap();    
-        res.send(b"hi").unwrap();
+    router.post(keys_pattern, move |mut req: Request, mut res: Response, cap: Captures| {
+        let mut body = String::new();
+        match req.read_to_string(&mut body) {
+            Ok(length) => {
+                if let Some(key) = cap.unwrap().pop() {
+                    if length > 0 {
+                        let mut locked_store = post_store.lock().unwrap();
+                        locked_store.write(key, body);
+                        *res.status_mut() = StatusCode::Accepted;
+                    } else {
+                        *res.status_mut() = StatusCode::BadRequest;
+                    }
+                }
+            },
+            _ => {
+                *res.status_mut() = StatusCode::InternalServerError;
+            }
+        };
     });
 
     router.finalize().unwrap();
