@@ -14,7 +14,7 @@ impl Store {
         }
     }
 
-    pub fn shared(db: String) -> Arc<Mutex<Store>> {
+    pub fn shared<S: Into<String>>(db: S) -> Arc<Mutex<Store>> {
         Arc::new(Mutex::new(Store::new(db)))
     }
 
@@ -27,9 +27,8 @@ impl Store {
         true
     }
 
-    pub fn delete<S: Into<String>>(&mut self, key: S) -> bool {
-        self.map.remove(&key.into());
-        true
+    pub fn delete<S: Into<String>>(&mut self, key: S) -> Option<String> {
+        self.map.remove(&key.into())
     }
 }
 
@@ -44,7 +43,7 @@ fn test_write_read() {
 fn test_write_delete() {
     let mut store = Store::new("test");
     store.write("one", "two");
-    assert_eq!(store.delete("one"), true);
+    assert_eq!(store.delete("one"), Some(String::from("two")));
     assert_eq!(store.read("one"), None);
 }
 
