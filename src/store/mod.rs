@@ -1,16 +1,18 @@
 use std::collections::btree_map::BTreeMap;
 use std::sync::{Arc, Mutex};
 
+type Data = BTreeMap<String, String>;
+
 pub struct Store {
     pub db: String,
-    map: BTreeMap<String, String>
+    data: Data
 }
 
 impl Store {
     pub fn new<S: Into<String>>(db: S) -> Store {
         Store {
             db: db.into(),
-            map: BTreeMap::new()
+            data: Data::new()
         }
     }
 
@@ -19,16 +21,16 @@ impl Store {
     }
 
     pub fn read<S: Into<String>>(&self, key: S) -> Option<&String> {
-        self.map.get(&key.into()) 
+        self.data.get(&key.into()) 
     }
 
     pub fn write<S: Into<String>>(&mut self, key: S, value: S) -> bool {
-        self.map.insert(key.into(), value.into());
+        self.data.insert(key.into(), value.into());
         true
     }
 
     pub fn delete<S: Into<String>>(&mut self, key: S) -> Option<String> {
-        self.map.remove(&key.into())
+        self.data.remove(&key.into())
     }
 }
 
