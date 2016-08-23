@@ -37,15 +37,15 @@ impl Store {
 #[test]
 fn test_write_read() {
     let mut store = Store::new("test");
-    assert_eq!(store.write("one", "two"), true);
-    assert_eq!(store.read("one"), Some(&String::from("two")));
+    assert_eq!(true, store.write("one", "two"));
+    assert_eq!(Some(&String::from("two")), store.read("one"));
 }
 
 #[test]
 fn test_write_delete() {
     let mut store = Store::new("test");
     store.write("one", "two");
-    assert_eq!(store.delete("one"), Some(String::from("two")));
-    assert_eq!(store.read("one"), None);
+    assert_eq!(Some(String::from("two")), store.delete("one"));
+    assert_eq!(None, store.read("one"));
 }
 
