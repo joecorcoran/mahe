@@ -23,7 +23,6 @@ fn main() {
             ip: server_matches.value_of("ip").unwrap_or("0.0.0.0"),
             port: server_matches.value_of("port").unwrap_or("8989")
         };
-        let db = String::from(server_matches.value_of("database").unwrap_or("default"));
-        start(db, options);
+        start(server_matches.value_of("database").unwrap_or("default"), options);
     }
 }

@@ -9,8 +9,8 @@ pub struct ServerOptions<'a> {
     pub port: &'a str
 }
 
-pub fn start(db: String, options: ServerOptions) {
-    let store = Store::shared(db.clone());
+pub fn start(db: &str, options: ServerOptions) {
+    let store = Store::shared(db);
     let keys_pattern = r"/keys/([^/]+)$";
 
     let read_store = store.clone();
